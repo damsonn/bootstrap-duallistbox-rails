@@ -1,8 +1,11 @@
 # Bootstrap::Duallistbox::Rails
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/bootstrap/duallistbox/rails`. To experiment with that code, run `bin/console` for an interactive prompt.
+Assets for https://github.com/istvan-ujjmeszaros/bootstrap-duallistbox - see it for details
 
-TODO: Delete this and the text above, and describe your gem
+add to application.js and application.css something like
+
+    //= require bootstrap-duallistbox
+
 
 ## Installation
 
@@ -19,10 +22,6 @@ And then execute:
 Or install it yourself as:
 
     $ gem install bootstrap-duallistbox-rails
-
-## Usage
-
-TODO: Write usage instructions here
 
 ## Development
 

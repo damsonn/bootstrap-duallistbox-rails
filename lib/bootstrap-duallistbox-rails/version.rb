@@ -1,7 +1,7 @@
 module Bootstrap
   module Duallistbox
     module Rails
-      VERSION = "0.1.0"
+      VERSION = "3.0.2"
     end
   end
 end

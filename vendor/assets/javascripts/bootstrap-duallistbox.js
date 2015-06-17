@@ -9,6 +9,7 @@
       removeSelectedLabel: 'Remove selected',
       removeAllLabel: 'Remove all',
       moveOnSelect: true,                                                                 // true/false (forced true on androids, see the comment later)
+      moveAll: true,                                                                      // true/false
       preserveSelectionOnMove: false,                                                     // 'all' / 'moved' / false
       selectedListLabel: false,                                                           // 'string', false
       nonSelectedListLabel: false,                                                        // 'string', false
@@ -397,6 +398,7 @@
       this.setNonSelectedListLabel(this.settings.nonSelectedListLabel);
       this.setHelperSelectNamePostfix(this.settings.helperSelectNamePostfix);
       this.setSelectOrMinimalHeight(this.settings.selectorMinimalHeight);
+      this.setMoveAll(this.settings.moveAll);
 
       updateSelectionStates(this);
 
@@ -547,6 +549,22 @@
       }
       this.elements.select1.height(height);
       this.elements.select2.height(height);
+      if (refresh) {
+        refreshSelects(this);
+      }
+      return this.element;
+    },
+    setMoveAll :function(value, refresh) {
+      if (!value) {
+        this.elements.moveButton.css('margin-top', '38px');
+        this.elements.moveAllButton.hide();
+        this.elements.removeAllButton.hide();
+      } else {
+        this.elements.moveButton.css('margin-top', '0px');
+        this.elements.moveAllButton.show();
+        this.elements.removeAllButton.show();
+      }
+      this.settings.moveAll = value;
       if (refresh) {
         refreshSelects(this);
       }

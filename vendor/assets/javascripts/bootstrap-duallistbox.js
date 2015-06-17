@@ -1,16 +1,7 @@
-/*
- *  Bootstrap Duallistbox - v3.0.2
- *  A responsive dual listbox widget optimized for Twitter Bootstrap. It works on all modern browsers and on touch devices.
- *  http://www.virtuosoft.eu/code/bootstrap-duallistbox/
- *
- *  Made by István Ujj-Mészáros
- *  Under Apache License v2.0 License
- */
 ;(function ($, window, document, undefined) {
   // Create the defaults once
   var pluginName = 'bootstrapDualListbox',
     defaults = {
-      bootstrap2Compatible: false,
       filterTextClear: 'show all',
       filterPlaceHolder: 'Filter',
       moveSelectedLabel: 'Move selected',
@@ -29,7 +20,8 @@
       infoText: 'Showing all {0}',                                                        // text when all options are visible / false for no info text
       infoTextFiltered: '<span class="label label-warning">Filtered</span> {0} from {1}', // when not all of the options are visible due to the filter
       infoTextEmpty: 'Empty list',                                                        // when there are no options present in the list
-      filterOnValues: false                                                               // filter by selector's values, boolean
+      filterOnValues: false,                                                              // filter by selector's values, boolean
+      template: false                                                                     // jQuery selector to template provided by user
     },
     // Selections are invisible on android if the containing select is styled with CSS
     // http://code.google.com/p/android/issues/detail?id=16922
@@ -145,10 +137,11 @@
 
     dualListbox.elements['select'+selectIndex].empty().scrollTop(0);
     var regex = new RegExp($.trim(dualListbox.elements['filterInput'+selectIndex].val()), 'gi'),
+      allOptions = dualListbox.element.find('option'),
       options = dualListbox.element;
 
     if (selectIndex === 1) {
-      options = options.find('option').not(':selected');
+      options = allOptions.not(':selected');
     } else  {
       options = options.find('option:selected');
     }
@@ -160,16 +153,17 @@
         isFiltered = false;
         dualListbox.elements['select'+selectIndex].append($item.clone(true).prop('selected', $item.data('_selected')));
       }
-      dualListbox.element.find('option').eq($item.data('original-index')).data('filtered'+selectIndex, isFiltered);
+      allOptions.eq($item.data('original-index')).data('filtered'+selectIndex, isFiltered);
     });
 
     refreshInfo(dualListbox);
   }
 
   function saveSelections(dualListbox, selectIndex) {
+    var options = dualListbox.element.find('option');
     dualListbox.elements['select'+selectIndex].find('option').each(function(index, item) {
       var $item = $(item);
-      dualListbox.element.find('option').eq($item.data('original-index')).data('_selected', $item.prop('selected'));
+      options.eq($item.data('original-index')).data('_selected', $item.prop('selected'));
     });
   }
 
@@ -314,46 +308,48 @@
   BootstrapDualListbox.prototype = {
     init: function () {
       // Add the custom HTML template
-      this.container = $('' +
-        '<div class="bootstrap-duallistbox-container">' +
-        ' <div class="box1">' +
-        '   <label></label>' +
-        '   <span class="info-container">' +
-        '     <span class="info"></span>' +
-        '     <button type="button" class="btn clear1 pull-right"></button>' +
-        '   </span>' +
-        '   <input class="filter" type="text">' +
-        '   <div class="btn-group buttons">' +
-        '     <button type="button" class="btn moveall">' +
-        '       <i></i>' +
-        '       <i></i>' +
-        '     </button>' +
-        '     <button type="button" class="btn move">' +
-        '       <i></i>' +
-        '     </button>' +
-        '   </div>' +
-        '   <select multiple="multiple"></select>' +
-        ' </div>' +
-        ' <div class="box2">' +
-        '   <label></label>' +
-        '   <span class="info-container">' +
-        '     <span class="info"></span>' +
-        '     <button type="button" class="btn clear2 pull-right"></button>' +
-        '   </span>' +
-        '   <input class="filter" type="text">' +
-        '   <div class="btn-group buttons">' +
-        '     <button type="button" class="btn remove">' +
-        '       <i></i>' +
-        '     </button>' +
-        '     <button type="button" class="btn removeall">' +
-        '       <i></i>' +
-        '       <i></i>' +
-        '     </button>' +
-        '   </div>' +
-        '   <select multiple="multiple"></select>' +
-        ' </div>' +
-        '</div>')
+      if (this.settings.template) {
+        this.container = $($(this.settings.template).html()).insertBefore(this.element);
+      } else {
+        this.container = $('' +
+          '<div class="bootstrap-duallistbox-container row">' +
+          ' <div class="box1 col-md-5">' +
+          '   <label></label>' +
+          '   <span class="info-container">' +
+          '     <span class="info"></span>' +
+          '     <button type="button" class="clear1 btn pull-right btn-default btn-xs"></button>' +
+          '   </span>' +
+          '   <input class="filter form-control" type="text">' +
+          '   <select multiple="multiple"></select>' +
+          ' </div>' +
+          ' <div class="col-md-2 center-block">' +
+          '   <button type="button" class="moveall btn btn-default col-md-8 col-md-offset-2">' +
+          '     <span class="glyphicon glyphicon-list"></span>' +
+          '     <span class="glyphicon glyphicon-chevron-right"></span>' +
+          '   </button>' +
+          '   <button type="button" class="move btn btn-default col-md-8 col-md-offset-2">' +
+          '     <span class="glyphicon glyphicon-chevron-right"></span>' +
+          '   </button>' +
+          '   <button type="button" class="remove btn btn-default col-md-8 col-md-offset-2">' +
+          '     <span class="glyphicon glyphicon-chevron-left"></span>' +
+          '   </button>' +
+          '   <button type="button" class="removeall btn btn-default col-md-8 col-md-offset-2">' +
+          '     <span class="glyphicon glyphicon-chevron-left"></span>' +
+          '     <span class="glyphicon glyphicon-list"></span>' +
+          '   </button>' +
+          ' </div>' +
+          ' <div class="box2 col-md-5">' +
+          '   <label></label>' +
+          '   <span class="info-container">' +
+          '     <span class="info"></span>' +
+          '     <button type="button" class="clear2 btn pull-right btn-default btn-xs"></button>' +
+          '   </span>' +
+          '   <input class="filter form-control" type="text">' +
+          '   <select multiple="multiple"></select>' +
+          ' </div>' +
+          '</div>')
         .insertBefore(this.element);
+      }
 
       // Cache the inner elements
       this.elements = {
@@ -370,10 +366,10 @@
         info2: $('.box2 .info', this.container),
         select1: $('.box1 select', this.container),
         select2: $('.box2 select', this.container),
-        moveButton: $('.box1 .move', this.container),
-        removeButton: $('.box2 .remove', this.container),
-        moveAllButton: $('.box1 .moveall', this.container),
-        removeAllButton: $('.box2 .removeall', this.container),
+        moveButton: $('button.move', this.container),
+        removeButton: $('button.remove', this.container),
+        moveAllButton: $('button.moveall', this.container),
+        removeAllButton: $('button.removeall', this.container),
         form: $($('.box1 .filter', this.container)[0].form)
       };
 
@@ -389,7 +385,6 @@
       // Apply all settings
       this.selectedElements = 0;
       this.elementCount = 0;
-      this.setBootstrap2Compatible(this.settings.bootstrap2Compatible);
       this.setFilterTextClear(this.settings.filterTextClear);
       this.setFilterPlaceHolder(this.settings.filterPlaceHolder);
       this.setMoveSelectedLabel(this.settings.moveSelectedLabel);
@@ -419,30 +414,6 @@
       bindEvents(this);
       refreshSelects(this);
 
-      return this.element;
-    },
-    setBootstrap2Compatible: function(value, refresh) {
-      this.settings.bootstrap2Compatible = value;
-      if (value) {
-        this.container.removeClass('row').addClass('row-fluid bs2compatible');
-        this.container.find('.box1, .box2').removeClass('col-md-6').addClass('span6');
-        this.container.find('.clear1, .clear2').removeClass('btn-default btn-xs').addClass('btn-mini');
-        this.container.find('input, select').removeClass('form-control');
-        this.container.find('.btn').removeClass('btn-default');
-        this.container.find('.moveall > i, .move > i').removeClass('glyphicon glyphicon-arrow-right').addClass('icon-arrow-right');
-        this.container.find('.removeall > i, .remove > i').removeClass('glyphicon glyphicon-arrow-left').addClass('icon-arrow-left');
-      } else {
-        this.container.removeClass('row-fluid bs2compatible').addClass('row');
-        this.container.find('.box1, .box2').removeClass('span6').addClass('col-md-6');
-        this.container.find('.clear1, .clear2').removeClass('btn-mini').addClass('btn-default btn-xs');
-        this.container.find('input, select').addClass('form-control');
-        this.container.find('.btn').addClass('btn-default');
-        this.container.find('.moveall > i, .move > i').removeClass('icon-arrow-right').addClass('glyphicon glyphicon-arrow-right');
-        this.container.find('.removeall > i, .remove > i').removeClass('icon-arrow-left').addClass('glyphicon glyphicon-arrow-left');
-      }
-      if (refresh) {
-        refreshSelects(this);
-      }
       return this.element;
     },
     setFilterTextClear: function(value, refresh) {
